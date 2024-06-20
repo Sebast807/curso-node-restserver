@@ -8,9 +8,8 @@ const dbConnection = async () => {
         
     } catch (error) {
         console.log(error);
-        throw new Error('Database Error');
+        throw new Error('Database Error', error.message);
     }
-
 }
 
 module.exports = {
