@@ -1,5 +1,7 @@
 const express = require('express');
+const morgan = require('morgan');
 const cors = require('cors');
+
 const { dbConnection } = require('../database/config.db');
 
 class Server {
@@ -9,6 +11,7 @@ class Server {
         this.app = express();
         this.port = process.env.PORT;
         this.usersPath = '/api/usuarios';
+        this.authPath = '/api/auth'
 
         //Conectar base de datos
         this.DBConnect();
@@ -33,17 +36,21 @@ class Server {
         //cors
         this.app.use(cors());
 
+        //Morgan
+        this.app.use(morgan('dev'));
+
     }
 
     routes() {
 
+        this.app.use(this.authPath, require('../routes/auth.routes'));
         this.app.use(this.usersPath, require('../routes/user.routes'));
 
     }
 
     listen() {
         this.app.listen(this.port, () => {
-            console.log(`Server is running on port ${this.port}`);
+            console.log(`Server is running on http://localhost:${this.port}`);
         });
     }
 }

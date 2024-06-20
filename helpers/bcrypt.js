@@ -5,6 +5,11 @@ const encrypt = (password = '') => {
     return bCrypt.hashSync(password, salt);
 }
 
+const compareHash = (password = '', hash = '') => {
+    return bCrypt.compareSync(password, hash);
+}
+
 module.exports = {
-    encrypt
+    encrypt,
+    compareHash
 }

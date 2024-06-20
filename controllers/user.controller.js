@@ -1,5 +1,5 @@
 const { response, request } = require('express');
-const { encrypt } = require('../helpers/encrypt-pw');
+const { encrypt } = require('../helpers/bcrypt');
 
 const User = require('../models/user.model');
 
@@ -8,12 +8,6 @@ const getUsers = async (req = request, res = response) => {
     const { limit = 5, from = 0 } = req.query;
     const query = { status: true };
 
-    // const users = await User.find(query)
-    //     .skip(from)
-    //     .limit(Number(limit))
-
-    // const total = await User.countDocuments(query);
-
     const response = await Promise.all([
         User.countDocuments(query),
         User.find(query)
@@ -21,21 +15,20 @@ const getUsers = async (req = request, res = response) => {
             .limit(Number(limit))
     ]);
 
-    const [ count, users ] = response
+    const [count, users] = response
 
     res.json({
         msg: 'get API - controller',
         count,
         users
-    })
-
+    });
 }
 
 const postUsers = async (req, res = response) => {
 
     const { name, email, password, role } = req.body;
     const user = new User({ name, email, password, role });
- 
+
     //Verificar si el correo existe
 
     //Encriptar la contraseña
@@ -72,14 +65,15 @@ const deleteUsers = async (req, res = response) => {
 
     const { id } = req.params;
 
-    //Borrar directamente en la db
-    // const user = await User.findByIdAndDelete( id );
+    const user = await User.findByIdAndUpdate(id, { status: false });
 
-    const user = await User.findByIdAndUpdate( id, {status:true} );
+    const userAuth = req.user;
+
     res.json({
         msg: 'delete API - controller',
         id,
-        user
+        user,
+        userAuth
     });
 }
 
@@ -96,3 +90,4 @@ module.exports = {
     patchUsers,
     deleteUsers
 };
+
